@@ -1,6 +1,6 @@
 #include "CustomKnob.h"
 
-CustomKnob::CustomKnob(const juce::String& knobID, NeuralPluginAudioProcessor& p)
+CustomKnob::CustomKnob(const juce::String& knobID, PluginAudioProcessor& p)
     : knobComponentID(knobID),audioProcessor(p) {
 	setSize(20, 50);
 	knob.setComponentID(knobID);

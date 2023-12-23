@@ -19,14 +19,14 @@ class CustomKnob : public juce::Component,
 	public juce::Slider::Listener
 {
 public:
-	CustomKnob(const juce::String& knobID, NeuralPluginAudioProcessor& p);
+	CustomKnob(const juce::String& knobID, PluginAudioProcessor& p);
 	void paint(juce::Graphics& g) override;
 	void resized() override;
 	void sliderValueChanged(juce::Slider* slider) override;
 
 private:
 	OtherLookAndFeel otherLookAndFeel;
-	NeuralPluginAudioProcessor& audioProcessor;
+	PluginAudioProcessor& audioProcessor;
     juce::Slider knob;
 	juce::String knobComponentID;
 

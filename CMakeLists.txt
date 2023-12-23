@@ -34,13 +34,14 @@ juce_generate_juce_header(Plugin)
 
 target_sources(Plugin
     PRIVATE
-    NeuralPlugin/Source/PluginEditor.cpp
-    NeuralPlugin/Source/PluginProcessor.cpp
-    NeuralPlugin/Source/PluginEditor.h
-    NeuralPlugin/Source/PluginProcessor.h
-    NeuralPlugin/Source/RT_LSTM.h
-    NeuralPlugin/Source/RT_LSTM.cpp
-   
+    Plugin/Plugin/Source/PluginEditor.cpp
+    Plugin/Plugin/Source/PluginProcessor.cpp
+    Plugin/Plugin/Source/PluginEditor.h
+    Plugin/Plugin/Source/PluginProcessor.h 
+    Plugin/Plugin/Source/RT_LSTM.h
+    Plugin/Plugin/Source/RT_LSTM.cpp 
+    Plugin/Plugin/Source/CustomKnob.h
+    Plugin/Plugin/Source/CustomKnob.cpp   
 )
 
 
