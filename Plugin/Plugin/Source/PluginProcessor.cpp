@@ -1,32 +1,39 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin processor.
+    This file was auto-generated!
+
+    It contains the basic framework code for a JUCE plugin processor.
 
   ==============================================================================
 */
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <iostream>
+#include <fstream>
 
 //==============================================================================
 PluginAudioProcessor::PluginAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", AudioChannelSet::stereo(), true)
+#endif
+    )
+
 #endif
 {
-    setUpDataDirectories();
+    setupDataDirectories();
+    //installTones();
+    resetDirectory(userAppDataDirectory_tones);
     // Sort jsonFiles alphabetically
     std::sort(jsonFiles.begin(), jsonFiles.end());
     if (jsonFiles.size() > 0) {
-        saveModel(jsonFiles[current_model_index]);
+        loadConfig(jsonFiles[current_model_index]);
     }
 
     // initialize parameters:
@@ -42,41 +49,42 @@ PluginAudioProcessor::PluginAudioProcessor()
     addParameter(reverbParam = new AudioParameterFloat(REVERB_ID, REVERB_NAME, NormalisableRange<float>(0.0f, 1.0f, 0.001f), 0.0f));
 }
 
-PluginAudioProcessor::~PluginAudioProcessor(){
 
+PluginAudioProcessor::~PluginAudioProcessor()
+{
 }
 
 //==============================================================================
-const juce::String PluginAudioProcessor::getName() const
+const String PluginAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
 bool PluginAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool PluginAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool PluginAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double PluginAudioProcessor::getTailLengthSeconds() const
@@ -87,7 +95,7 @@ double PluginAudioProcessor::getTailLengthSeconds() const
 int PluginAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    // so this should be at least 1, even if you're not really implementing programs.
 }
 
 int PluginAudioProcessor::getCurrentProgram()
@@ -95,26 +103,32 @@ int PluginAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void PluginAudioProcessor::setCurrentProgram (int index)
+void PluginAudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const juce::String PluginAudioProcessor::getProgramName (int index)
+const String PluginAudioProcessor::getProgramName(int index)
 {
     return {};
 }
 
-void PluginAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void PluginAudioProcessor::changeProgramName(int index, const String& newName)
 {
 }
 
 //==============================================================================
-void PluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-
     LSTM.reset();
+
+    // set up DC blocker
+    dcBlocker.coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 35.0f);
+    dsp::ProcessSpec spec{ sampleRate, static_cast<uint32> (samplesPerBlock), 2 };
+    dcBlocker.prepare(spec);
+
+    // fx chain
 }
 
 void PluginAudioProcessor::releaseResources()
@@ -124,49 +138,43 @@ void PluginAudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool PluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool PluginAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+#if JucePlugin_IsMidiEffect
+    ignoreUnused(layouts);
     return true;
-  #else
+#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
+        && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
+#endif
 
     return true;
-  #endif
+#endif
 }
 #endif
 
-void PluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+
+void PluginAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    ScopedNoDenormals noDenormals;
 
+    // Setup Audio Data
     const int numSamples = buffer.getNumSamples();
+    const int numInputChannels = getTotalNumInputChannels();
+    const int sampleRate = getSampleRate();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    auto block = dsp::AudioBlock<float>(buffer).getSingleChannelBlock(0);
+    auto context = juce::dsp::ProcessContextReplacing<float>(block);
 
-
+    // Amp =============================================================================
     if (amp_state == 1) {
         auto gain = static_cast<float> (gainParam->get());
         auto master = static_cast<float> (masterParam->get());
@@ -180,10 +188,23 @@ void PluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         auto reverb = (static_cast<float> (reverbParam->get()));
 
         auto model = static_cast<float> (modelParam->get());
+        model_index = getModelIndex(model);
+
+        auto ir = static_cast<float> (irParam->get());
+        //ir_index = getIrIndex(ir);
+
+        // Applying gain adjustment for snapshot models
+        if (LSTM.input_size == 1) {
+            buffer.applyGain(gain * 2.0);
+        }
+
+        // Process EQ
+
+
         // Apply LSTM model
         if (model_loaded == 1 && lstm_state == true) {
             if (current_model_index != model_index) {
-                saveModel(jsonFiles[model_index]);
+                loadConfig(jsonFiles[model_index]);
                 current_model_index = model_index;
             }
 
@@ -198,8 +219,37 @@ void PluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
                 LSTM.process(buffer.getReadPointer(0), gain, master, buffer.getWritePointer(0), numSamples);
             }
         }
+
+        // Process IR
+        if (ir_state == true && num_irs > 0) {
+            if (current_ir_index != ir_index) {
+                //loadIR(irFiles[ir_index]);
+                current_ir_index = ir_index;
+            }
+            auto block = dsp::AudioBlock<float>(buffer).getSingleChannelBlock(0);
+            auto context = juce::dsp::ProcessContextReplacing<float>(block);
+
+            // IR generally makes output quieter, add volume here to make ir on/off volume more even
+            buffer.applyGain(2.0);
+        }
+
+        //    Master Volume 
+        if (LSTM.input_size == 1 || LSTM.input_size == 2) {
+            buffer.applyGain(master * 2.0); // Adding volume range (2x) mainly for clean models
+        }
+
+        // Process Delay, and Reverb
+        //set_delayParams(delay);
+        //set_reverbParams(reverb);
+
     }
 
+    // process DC blocker
+    auto monoBlock = dsp::AudioBlock<float>(buffer).getSingleChannelBlock(0);
+    dcBlocker.process(dsp::ProcessContextReplacing<float>(monoBlock));
+
+    for (int ch = 1; ch < buffer.getNumChannels(); ++ch)
+        buffer.copyFrom(ch, 0, buffer, 0, 0, buffer.getNumSamples());
 }
 
 //==============================================================================
@@ -208,53 +258,59 @@ bool PluginAudioProcessor::hasEditor() const
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* PluginAudioProcessor::createEditor()
+AudioProcessorEditor* PluginAudioProcessor::createEditor()
 {
-    return new PluginAudioProcessorEditor (*this);
+    return new PluginAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void PluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void PluginAudioProcessor::getStateInformation(MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    MemoryOutputStream stream(destData, true);
+
+    stream.writeFloat(*gainParam);
+    stream.writeFloat(*masterParam);
+    stream.writeFloat(*bassParam);
+    stream.writeFloat(*midParam);
+    stream.writeFloat(*trebleParam);
+    stream.writeFloat(*presenceParam);
+    stream.writeFloat(*modelParam);
+    stream.writeFloat(*irParam);
+    stream.writeFloat(*delayParam);
+    stream.writeFloat(*reverbParam);
 }
 
-void PluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void PluginAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    MemoryInputStream stream(data, static_cast<size_t> (sizeInBytes), false);
+
+    gainParam->setValueNotifyingHost(stream.readFloat());
+    masterParam->setValueNotifyingHost(stream.readFloat());
+    bassParam->setValueNotifyingHost(stream.readFloat());
+    midParam->setValueNotifyingHost(stream.readFloat());
+    trebleParam->setValueNotifyingHost(stream.readFloat());
+    presenceParam->setValueNotifyingHost(stream.readFloat());
+    modelParam->setValueNotifyingHost(stream.readFloat());
+    irParam->setValueNotifyingHost(stream.readFloat());
+    delayParam->setValueNotifyingHost(stream.readFloat());
+    reverbParam->setValueNotifyingHost(stream.readFloat());
 }
 
-//==============================================================================
-// This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+int PluginAudioProcessor::getModelIndex(float model_param)
 {
-    return new PluginAudioProcessor();
+    int a = static_cast<int>(round(model_param * (num_models - 1.0)));
+    if (a > num_models - 1) {
+        a = num_models - 1;
+    }
+    else if (a < 0) {
+        a = 0;
+    }
+    return a;
 }
 
-void PluginAudioProcessor::setValueKnob1(float knob_value)
+void PluginAudioProcessor::loadConfig(File configFile)
 {
-    knob_value1 = knob_value;
-}
-
-void PluginAudioProcessor::setValueKnob2(float knob_value)
-{
-    knob_value2 = knob_value;
-}
-
-void PluginAudioProcessor::setValueKnob3(float knob_value)
-{
-    knob_value3 = knob_value;
-}
-
-
-void PluginAudioProcessor::saveModel(File configFile)
-{
-
     this->suspendProcessing(true);
-
     String path = configFile.getFullPathName();
     char_filename = path.toUTF8();
 
@@ -284,31 +340,18 @@ void PluginAudioProcessor::saveModel(File configFile)
     this->suspendProcessing(false);
 }
 
-void PluginAudioProcessor::setUpDataDirectories()
+
+
+void PluginAudioProcessor::resetDirectory(const File& file)
 {
-    // User app data directory
-    File userAppDataTempFile = userAppDataDirectory.getChildFile("tmp.pdl");
-
-    File userAppDataTempFile_tones = userAppDataDirectory_tones.getChildFile("tmp.pdl");
-
-    // Create (and delete) temp file if necessary, so that user doesn't have
-    // to manually create directories
-    if (!userAppDataDirectory.exists()) {
-        userAppDataTempFile.create();
+    jsonFiles.clear();
+    if (file.isDirectory())
+    {
+        juce::Array<juce::File> results;
+        file.findChildFiles(results, juce::File::findFiles, false, "*.json");
+        for (int i = results.size(); --i >= 0;)
+            jsonFiles.push_back(File(results.getReference(i).getFullPathName()));
     }
-    if (userAppDataTempFile.existsAsFile()) {
-        userAppDataTempFile.deleteFile();
-    }
-
-    if (!userAppDataDirectory_tones.exists()) {
-        userAppDataTempFile_tones.create();
-    }
-    if (userAppDataTempFile_tones.existsAsFile()) {
-        userAppDataTempFile_tones.deleteFile();
-    }
-
-    // Add the tones directory and update tone list
-    addDirectory(userAppDataDirectory_tones);
 }
 
 
@@ -326,4 +369,65 @@ void PluginAudioProcessor::addDirectory(const File& file)
     }
 }
 
+void PluginAudioProcessor::setupDataDirectories()
+{
+    // User app data directory
+    File userAppDataTempFile = userAppDataDirectory.getChildFile("tmp.pdl");
 
+    File userAppDataTempFile_tones = userAppDataDirectory_tones.getChildFile("tmp.pdl");
+
+    File userAppDataTempFile_irs = userAppDataDirectory_irs.getChildFile("tmp.pdl");
+
+    // Create (and delete) temp file if necessary, so that user doesn't have
+    // to manually create directories
+    if (!userAppDataDirectory.exists()) {
+        userAppDataTempFile.create();
+    }
+    if (userAppDataTempFile.existsAsFile()) {
+        userAppDataTempFile.deleteFile();
+    }
+
+    if (!userAppDataDirectory_tones.exists()) {
+        userAppDataTempFile_tones.create();
+    }
+    if (userAppDataTempFile_tones.existsAsFile()) {
+        userAppDataTempFile_tones.deleteFile();
+    }
+
+    if (!userAppDataDirectory_irs.exists()) {
+        userAppDataTempFile_irs.create();
+    }
+    if (userAppDataTempFile_irs.existsAsFile()) {
+        userAppDataTempFile_irs.deleteFile();
+    }
+
+
+    // Add the tones directory and update tone list
+    addDirectory(userAppDataDirectory_tones);
+    //addDirectoryIR(userAppDataDirectory_irs);
+}
+
+
+
+
+float PluginAudioProcessor::convertLogScale(float in_value, float x_min, float x_max, float y_min, float y_max)
+{
+    float b = log(y_max / y_min) / (x_max - x_min);
+    float a = y_max / exp(b * x_max);
+    float converted_value = a * exp(b * in_value);
+    return converted_value;
+}
+
+
+float PluginAudioProcessor::decibelToLinear(float dbValue)
+{
+    return powf(10.0, dbValue / 20.0);
+}
+
+
+//==============================================================================
+// This creates new instances of the plugin..
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new PluginAudioProcessor();
+}

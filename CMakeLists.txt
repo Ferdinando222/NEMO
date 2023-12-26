@@ -42,6 +42,7 @@ target_sources(Plugin
     Plugin/Plugin/Source/RT_LSTM.cpp 
     Plugin/Plugin/Source/CustomKnob.h
     Plugin/Plugin/Source/CustomKnob.cpp   
+    Plugin/Plugin/Source/AmpOSCReceiver.h
 )
 
 
@@ -68,6 +69,7 @@ target_link_libraries(Plugin
         juce::juce_audio_utils
 	juce::juce_dsp
 	juce::juce_gui_basics
+	juce::juce_osc
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

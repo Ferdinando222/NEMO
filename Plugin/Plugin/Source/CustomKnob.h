@@ -22,7 +22,7 @@ public:
 	CustomKnob(const juce::String& knobID, PluginAudioProcessor& p);
 	void paint(juce::Graphics& g) override;
 	void resized() override;
-	void sliderValueChanged(juce::Slider* slider) override;
+	 //void sliderValueChanged(juce::Slider* slider) override;
 
 private:
 	OtherLookAndFeel otherLookAndFeel;

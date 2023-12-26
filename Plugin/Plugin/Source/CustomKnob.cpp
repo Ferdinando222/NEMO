@@ -21,6 +21,7 @@ void CustomKnob::resized()
 	knob.setBounds(getLocalBounds()); 
 
 }
+/*
 
 void CustomKnob::sliderValueChanged(juce::Slider* slider)
 {
@@ -44,6 +45,8 @@ void CustomKnob::sliderValueChanged(juce::Slider* slider)
     }
 
 }
+
+*/
 
 void OtherLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
 {
