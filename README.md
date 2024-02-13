@@ -20,7 +20,7 @@ Open the project in Visual Studio and build the project. `For safety, rebuild wi
 You can run the NEMO plugin as a standalone software or in a DAW as a VST.
 
 <a align="center" href="https://github.com/Ferdinando222/NEMO" target="_blank">
-  <img src="./Documentation/Music_Is_People.png" width="100%" />
+  <img src="./Documentation/nemo.png" width="50%" />
 </a>
 
 
