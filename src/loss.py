@@ -65,13 +65,13 @@ class PreEmph(nn.Module):
         return output.permute(2, 0, 1), target.permute(2, 0, 1)
 
 class LossWrapper(nn.Module):
-    def __init__(self, losses={'ESR': 0.75, 'DC': 0.25}, filter_cfs=None):
+    def __init__(self, losses={'ESR': 0.75, 'DC': 0.25,'DATA':1}, filter_cfs=None):
         """
         losses: list of names of loss functions to apply
         filter_cfs: apply a prefilter with these coeffcients. 
         """
         super(LossWrapper, self).__init__()
-        loss_dict = {'ESR': ESRLoss(), 'DC': DCLoss()}
+        loss_dict = {'ESR': ESRLoss(), 'DC': DCLoss(),'DATA':torch.nn.MSELoss()}
         # add ESR with PRe filter if a filter_cfs list was provided
         if filter_cfs:
             filter_cfs = PreEmph(filter_cfs)

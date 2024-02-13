@@ -8,6 +8,7 @@ project(NEMO VERSION 0.0.1)
 add_subdirectory("C:/Users/Utente/OneDrive - Politecnico di Milano/Desktop/JUCE" ./JUCE)                    # If you've put JUCE in a subdirectory called JUCE
 set(RTNEURAL_STL ON CACHE BOOL "Use RTNeural with this backend" FORCE)
 add_subdirectory(RTNeural ${CMAKE_CURRENT_BINARY_DIR}/RTNeural)
+add_subdirectory(Images)
 add_compile_definitions(JUCE_MODAL_LOOPS_PERMITTED=1)
 include_directories(RTNeural)
 
@@ -71,6 +72,7 @@ target_link_libraries(Plugin
 	juce::juce_gui_basics
 	juce::juce_osc
     PUBLIC
+	MyBinaryData
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)

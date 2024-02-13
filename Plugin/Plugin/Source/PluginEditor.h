@@ -14,10 +14,23 @@
 #include "PluginProcessor.h"
 #include "AmpOSCReceiver.h"
 #include <stdlib.h>
+#include "BinaryData.h"
 
 //==============================================================================
 /**
 */
+class OtherLookAndFeel : public juce::LookAndFeel_V4, public juce::Component
+{
+
+public:
+    void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle,
+        float rotaryEndAngle, juce::Slider& slider) override;
+    
+    void activateKnob(int on);
+
+private:
+    int colour = 0;
+};
 class PluginAudioProcessorEditor : public juce::AudioProcessorEditor,
     private juce::Button::Listener,
     private juce::Slider::Listener,
@@ -72,7 +85,12 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     PluginAudioProcessor& processor;
+    OtherLookAndFeel otherLookAndFeel;
+    OtherLookAndFeel redLookAndFeel;
 
+    //Background Image
+    Image backImage;
+ 
     // Amp Widgets
     Slider ampGainKnob;
     Slider ampMasterKnob;
@@ -108,9 +126,6 @@ private:
     TextButton loadIR;
     ToggleButton irButton;
     ToggleButton lstmButton;
-
-    juce::LookAndFeel_V4 blueLookAndFeel;
-    juce::LookAndFeel_V4 redLookAndFeel;
 
     juce::String fname;
     virtual void buttonClicked(Button* button) override;

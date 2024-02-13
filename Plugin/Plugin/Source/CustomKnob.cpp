@@ -21,6 +21,9 @@ void CustomKnob::resized()
 	knob.setBounds(getLocalBounds()); 
 
 }
+void CustomKnob::sliderValueChanged(juce::Slider* slider)
+{
+}
 /*
 
 void CustomKnob::sliderValueChanged(juce::Slider* slider)

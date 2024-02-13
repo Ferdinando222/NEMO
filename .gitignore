@@ -1,6 +1,19 @@
 #ENVIRONMENT 
 .venv
+RTNeural
+.idea
 
 
 #BUILD
 build
+
+#DATASET 
+data
+data_cond
+data_chorus
+data_delay
+
+#wandb
+src/wandb
+src/runs
+src/__pycache__

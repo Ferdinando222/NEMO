@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="h9mjh6" name="Plugin" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              includeBinaryInJuceHeader="1">
   <MAINGROUP id="buEH94" name="Plugin">
     <GROUP id="{329136A3-D838-5FBD-4E32-3B0498D82F9E}" name="Source">
       <FILE id="k5bmfw" name="PluginProcessor.cpp" compile="1" resource="0"

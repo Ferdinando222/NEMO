@@ -23,8 +23,8 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to
 
-    blueLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::aqua);
-    redLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::red);
+    //blueLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::aqua);
+    redLookAndFeel.activateKnob(1);
 
     //addAndMakeVisible(modelKnob);
     //ampGainKnob.setLookAndFeel(&ampSilverKnobLAF);
@@ -152,7 +152,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
 
 
     addAndMakeVisible(ampGainKnob);
-    ampGainKnob.setLookAndFeel(&blueLookAndFeel);
+    ampGainKnob.setLookAndFeel(&otherLookAndFeel);
     ampGainKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampGainKnob.setNumDecimalPlacesToDisplay(1);
     ampGainKnob.addListener(this);
@@ -191,7 +191,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     };
 
     addAndMakeVisible(ampMasterKnob);
-    ampMasterKnob.setLookAndFeel(&blueLookAndFeel);
+    ampMasterKnob.setLookAndFeel(&otherLookAndFeel);
     ampMasterKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampMasterKnob.setNumDecimalPlacesToDisplay(1);
     ampMasterKnob.addListener(this);
@@ -233,7 +233,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
 
 
     addAndMakeVisible(ampBassKnob);
-    ampBassKnob.setLookAndFeel(&blueLookAndFeel);
+    ampBassKnob.setLookAndFeel(&otherLookAndFeel);
     ampBassKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampBassKnob.setNumDecimalPlacesToDisplay(1);
     ampBassKnob.addListener(this);
@@ -272,7 +272,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     };
 
     addAndMakeVisible(ampMidKnob);
-    ampMidKnob.setLookAndFeel(&blueLookAndFeel);
+    ampMidKnob.setLookAndFeel(&otherLookAndFeel);
     ampMidKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampMidKnob.setNumDecimalPlacesToDisplay(1);
     ampMidKnob.addListener(this);
@@ -311,7 +311,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     };
 
     addAndMakeVisible(ampTrebleKnob);
-    ampTrebleKnob.setLookAndFeel(&blueLookAndFeel);
+    ampTrebleKnob.setLookAndFeel(&otherLookAndFeel);
     ampTrebleKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampTrebleKnob.setNumDecimalPlacesToDisplay(1);
     ampTrebleKnob.addListener(this);
@@ -350,7 +350,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     };
 
     addAndMakeVisible(ampPresenceKnob);
-    ampPresenceKnob.setLookAndFeel(&blueLookAndFeel);
+    ampPresenceKnob.setLookAndFeel(&otherLookAndFeel);
     ampPresenceKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampPresenceKnob.setNumDecimalPlacesToDisplay(1);
     ampPresenceKnob.addListener(this);
@@ -389,7 +389,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     };
 
     addAndMakeVisible(ampDelayKnob);
-    ampDelayKnob.setLookAndFeel(&blueLookAndFeel);
+    ampDelayKnob.setLookAndFeel(&otherLookAndFeel);
     ampDelayKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampDelayKnob.setNumDecimalPlacesToDisplay(1);
     ampDelayKnob.addListener(this);
@@ -428,7 +428,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     };
 
     addAndMakeVisible(ampReverbKnob);
-    ampReverbKnob.setLookAndFeel(&blueLookAndFeel);
+    ampReverbKnob.setLookAndFeel(&otherLookAndFeel);
     ampReverbKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
     ampReverbKnob.setNumDecimalPlacesToDisplay(1);
     ampReverbKnob.addListener(this);
@@ -468,33 +468,49 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
 
     addAndMakeVisible(GainLabel);
     GainLabel.setText("Gain", juce::NotificationType::dontSendNotification);
+    GainLabel.setColour(Label::backgroundColourId, Colours::black);
+    GainLabel.setColour(Label::textColourId, Colours::white);
     GainLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(LevelLabel);
     LevelLabel.setText("Level", juce::NotificationType::dontSendNotification);
+    LevelLabel.setColour(Label::backgroundColourId, Colours::black);
+    LevelLabel.setColour(Label::textColourId, Colours::white);
     LevelLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(BassLabel);
     BassLabel.setText("Bass", juce::NotificationType::dontSendNotification);
+    BassLabel.setColour(Label::backgroundColourId, Colours::black);
+    BassLabel.setColour(Label::textColourId, Colours::white);
     BassLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(MidLabel);
     MidLabel.setText("Mid", juce::NotificationType::dontSendNotification);
+    MidLabel.setColour(Label::backgroundColourId, Colours::black);
+    MidLabel.setColour(Label::textColourId, Colours::white);
     MidLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(TrebleLabel);
     TrebleLabel.setText("Treble", juce::NotificationType::dontSendNotification);
+    TrebleLabel.setColour(Label::backgroundColourId, Colours::black);
+    TrebleLabel.setColour(Label::textColourId, Colours::white);
     TrebleLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(PresenceLabel);
     PresenceLabel.setText("Presence", juce::NotificationType::dontSendNotification);
+    PresenceLabel.setColour(Label::backgroundColourId, Colours::black);
+    PresenceLabel.setColour(Label::textColourId, Colours::white);
     PresenceLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(DelayLabel);
     DelayLabel.setText("Delay", juce::NotificationType::dontSendNotification);
+    DelayLabel.setColour(Label::backgroundColourId, Colours::black);
+    DelayLabel.setColour(Label::textColourId, Colours::white);
     DelayLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(ReverbLabel);
     ReverbLabel.setText("Reverb", juce::NotificationType::dontSendNotification);
+    ReverbLabel.setColour(Label::backgroundColourId, Colours::black);
+    ReverbLabel.setColour(Label::textColourId, Colours::white);
     ReverbLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(toneDropDownLabel);
@@ -583,14 +599,9 @@ PluginAudioProcessorEditor::~PluginAudioProcessorEditor()
 //==============================================================================
 void PluginAudioProcessorEditor::paint(Graphics& g)
 {
-    // Workaround for graphics on Windows builds (clipping code doesn't work correctly on Windows)
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    //g.drawImageAt(background, 0, 0);  // Debug Line: Redraw entire background image
-#else
-// Redraw only the clipped part of the background image
+    backImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
     juce::Rectangle<int> ClipRect = g.getClipBounds();
-    g.drawImage(background, ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight(), ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight());
-#endif
+    g.drawImageWithin(backImage, 0, 0, getWidth(), getHeight(), RectanglePlacement::stretchToFit);
 
 }
 
@@ -1094,16 +1105,88 @@ void PluginAudioProcessorEditor::setParamKnobColor()
 {
     // If the knob is used for a parameter, change it to red
     if (processor.params == 0) {
-        ampGainKnob.setLookAndFeel(&blueLookAndFeel);
-        ampMasterKnob.setLookAndFeel(&blueLookAndFeel);
+        ampGainKnob.setLookAndFeel(&otherLookAndFeel);
+        ampMasterKnob.setLookAndFeel(&otherLookAndFeel);
     }
     else if (processor.params == 1) {
         ampGainKnob.setLookAndFeel(&redLookAndFeel);
-        ampMasterKnob.setLookAndFeel(&blueLookAndFeel);
+        ampMasterKnob.setLookAndFeel(&otherLookAndFeel);
     }
     else if (processor.params == 2) {
         ampGainKnob.setLookAndFeel(&redLookAndFeel);
         ampMasterKnob.setLookAndFeel(&redLookAndFeel);
     }
 
+}
+
+void OtherLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
+{
+
+    float diameter = fmin(width, height) * 0.8;
+    float radius = diameter / 2;
+    float centerX = x + width / static_cast<float>(2);
+    float centerY = y + height / static_cast<float>(2);
+    float rx = centerX - radius;
+    float ry = centerY - radius;
+    float angle = rotaryStartAngle + (sliderPos * (rotaryEndAngle - rotaryStartAngle));
+
+    juce::Rectangle<float> dialArea(rx, ry, diameter, diameter);
+    juce::Rectangle<int> dialArea1(rx, ry, diameter, diameter);
+    juce::Path dialTick;
+    juce::Path dialTickContour;
+    juce::Path ellipse;
+    juce::Path arc;
+    juce::DropShadow shadow;
+    slider.setColour(Slider::textBoxBackgroundColourId, Colours::black);
+    g.setColour(juce::Colours::transparentBlack);
+
+    arc.addArc(rx, ry + 8, diameter, diameter, juce::float_Pi * 0.5, juce::float_Pi * 1.5, true);
+    g.fillPath(arc);
+
+
+    shadow.drawForPath(g, arc);
+
+    g.setColour(juce::Colours::dimgrey);
+    g.fillEllipse(dialArea);
+
+    g.setColour(juce::Colours::darkslategrey);
+    ellipse.addEllipse((centerX - radius * 0.8), (centerY - radius * 0.8), diameter * 0.8, diameter * 0.8);
+    g.fillPath(ellipse);
+
+
+    g.setColour(juce::Colours::black);
+    g.drawEllipse((centerX - radius * 0.8), (centerY - radius * 0.8), diameter * 0.8, diameter * 0.8, 2.5f);
+
+    shadow.colour = juce::Colours::grey;
+    shadow.drawForPath(g, ellipse);
+
+    if (colour == 0) {
+        g.setColour(juce::Colours::aqua);
+    }
+    else {
+        g.setColour(juce::Colours::red);
+    }
+    dialTick.addRectangle(0, -radius, 6.0f, radius * 0.5);
+    g.fillPath(dialTick, juce::AffineTransform::rotation(angle).translated(centerX, centerY));
+    shadow.radius = 30;
+    shadow.colour = juce::Colours::aqua;
+    shadow.drawForPath(g, dialTick);
+
+
+    g.setColour(juce::Colours::black);
+    dialTickContour.addRectangle(0, -radius, 6.0f, radius * 0.5);
+    g.strokePath(dialTickContour, juce::PathStrokeType(2.0, juce::PathStrokeType::JointStyle::beveled),
+        juce::AffineTransform::rotation(angle).translated(centerX, centerY));
+
+
+
+    g.setColour(juce::Colours::black);
+    g.drawEllipse(rx, ry, diameter, diameter, 2.5f);
+
+
+}
+
+void OtherLookAndFeel::activateKnob(int on)
+{
+    colour = on;
 }

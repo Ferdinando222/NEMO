@@ -84,8 +84,8 @@ def generate_dataset(input_audio_folder, output_audio_folder, frag_len_seconds=0
     assert os.path.exists(input_audio_folder), "Input audio folder not found " + input_audio_folder
     assert os.path.exists(output_audio_folder), "Output audio folder not found " + output_audio_folder
     # get audio files in the input folder
-    input_files = get_files_in_folder(input_audio_folder, ".wav")
-    output_files = get_files_in_folder(output_audio_folder, ".wav")
+    input_files = get_files_in_folder(input_audio_folder, "clean_signal-002.wav")
+    output_files = get_files_in_folder(output_audio_folder, "muff_train_1.wav")
     assert len(input_files) > 0, "get_files_in_folder yielded zero inputs files"
     assert len(output_files) > 0, "get_files_in_folder yielded zero outputs files"
 
@@ -112,7 +112,7 @@ def generate_dataset(input_audio_folder, output_audio_folder, frag_len_seconds=0
     return dataset 
 
 
-def get_train_valid_test_datasets(dataset, splits=[0.8, 0.1, 0.1]):
+def get_train_valid_test_datasets(dataset,device,splits=[0.8, 0.1, 0.1]):
     assert type(dataset) == TensorDataset, "dataset should be a TensorDataset but it is " + type(dataset)
     assert np.sum(splits) == 1, "Splits do not add up to one"
     assert (len(dataset) * np.min(splits)) > 1, "Smallest split yields zero size " + str(splits) + " over " + str(len(dataset))
@@ -134,6 +134,7 @@ def get_train_valid_test_datasets(dataset, splits=[0.8, 0.1, 0.1]):
         diff = req_items - len(dataset)
         train_size -= diff # hit the big one
         print("Cannot get that many items from the dataset: want", req_items, "got", len(dataset),  " trimming the big one by ", diff)
-          
-    train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+
+    generator = torch.Generator(device = device)
+    train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size],generator=generator)
     return train_dataset, val_dataset, test_dataset

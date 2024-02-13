@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import json
 from json import JSONEncoder
-import myk_models
+import models
 
 def get_device():
     if not torch.cuda.is_available():
@@ -16,7 +16,7 @@ def get_device():
         device = 'cuda'
     return device     
 
-def train_epoch(model : myk_models.SimpleLSTM,#torch.nn.Module, 
+def train_epoch(model : models.SimpleModel,#torch.nn.Module, 
                 dataloader : DataLoader,  
                 loss_functions, 
                 optimiser, 
@@ -54,7 +54,7 @@ def train_epoch(model : myk_models.SimpleLSTM,#torch.nn.Module,
     return ep_loss
 
 
-def train_epoch_interval(model : myk_models.SimpleLSTM,#torch.nn.Module, 
+def train_epoch_interval(model : models.SimpleModel,#torch.nn.Module, 
                 dataloader : DataLoader,  
                 loss_functions, 
                 optimiser, 
