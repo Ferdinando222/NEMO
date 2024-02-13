@@ -19,7 +19,7 @@ sweep_configuration = {
     "metric": {"goal": "minimize", "name": "val_loss"},
     "parameters": {
         "batch_size": {"values": [16,32,64]},
-        "lstm_hidden_size":{"values": [20,32,64,100]},
+        "lstm_hidden_size":{"values": [20,32,64,90]},
         "learning_rate": {"values":[1e-3,1e-4,1e-5]},
         "layer":{"values":[1,2,3]},
     },
@@ -57,7 +57,7 @@ def train():
         train_ds, val_ds, test_ds = data.get_train_valid_test_datasets(dataset,device)
 
         print("Creating model")
-        model = models.SimpleModel(hidden_size=lstm_hidden_size,num_layers=layers,model_type='GRU').to(device)
+        model = models.SimpleModel(hidden_size=lstm_hidden_size,num_layers=layers,model_type='LSTM').to(device)
 
         print("Creating data loaders")
         train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True, generator=torch.Generator(device=device))

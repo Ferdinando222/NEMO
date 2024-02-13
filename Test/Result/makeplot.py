@@ -1,28 +1,35 @@
+#%%
 import matplotlib.pyplot as plt
 
-# Dati da plottare
+# Data to plot
+# Data is manually input based on obtained values. The speed value is calculated as number_of_samples/processing_time
+# In our case, we consider 48000 samples
 
 # Hidden Size
-x = [10, 20, 30, 40, 50, 60]
+x = [10, 20, 30, 40, 50, 60, 70]
 
 # Speed
-y_rt = [4.95, 1.78, 0.88, 0.55, 0.33, 0.23]
-y_torch = [0.0068, 0.0047, 0.0051, 0.0056, 0.0059, 0.0056]
+y_rt = [69666, 69064, 44444, 36923,30000 ,24489,20600]
+y_torch = [2962,2526,2513, 2388,2285, 2253,2217]
 
-# Creazione del plot
-plt.plot(x, y_rt, label='RTNeura Static')
+# Create the plot
+plt.plot(x, y_rt, label='RTNeural Static')
 plt.plot(x, y_torch, label='Torch')
 
-# Aggiunta di etichette agli assi
+# Add labels to the axes
 plt.xlabel('Hidden Size')
 plt.ylabel('Speed of Processing')
 
-# Aggiunta di un titolo al plot
-plt.title('Plot Cartesiano')
+# Add a title to the plot
+plt.title('Cartesian Plot')
 
-# Aggiunta della legenda
+# Add a legend
 plt.legend()
 
-# Mostra il plot
+# Display the grid
 plt.grid(True)
+
+# Save the plot in the 'Plot' folder
+plt.savefig('./Plot/conv.png')
 plt.show()
+# %%

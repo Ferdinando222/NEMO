@@ -7,7 +7,7 @@
 #include <random>
 
 // Function to measure the performance of a PyTorch LSTM model
-void measure_performance_torch(torch::nn::LSTM& model, int n_samples) {
+void measure_performance_torch_lstm(torch::nn::LSTM& model, int n_samples) {
     auto signal = torch::rand({ 1,1,1 });
 
     // Execute the model and measure the time taken
@@ -25,6 +25,43 @@ void measure_performance_torch(torch::nn::LSTM& model, int n_samples) {
     std::cout << "PyTorch execution time: " << duration << " milliseconds" << std::endl;
 }
 
+// Function to measure the performance of a PyTorch GRU model
+void measure_performance_torch_gru(torch::nn::GRU& model, int n_samples) {
+    auto signal = torch::rand({ 1,1,1 });
+
+    // Execute the model and measure the time taken
+    auto start = std::chrono::steady_clock::now();
+
+    for (size_t i = 0; i < n_samples; ++i) {
+        auto out = model->forward(signal);
+    }
+
+    auto end = std::chrono::steady_clock::now();
+
+    // Calculate the execution duration in milliseconds
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << "PyTorch execution time: " << duration << " milliseconds" << std::endl;
+}
+
+// Function to measure the performance of a PyTorch Conv model
+void measure_performance_torch_conv(torch::nn::Conv1d& model, int n_samples) {
+    auto signal = torch::rand({ 1,1,10 });
+
+    // Execute the model and measure the time taken
+    auto start = std::chrono::steady_clock::now();
+
+    for (size_t i = 0; i < n_samples; ++i) {
+        auto out = model->forward(signal);
+    }
+
+    auto end = std::chrono::steady_clock::now();
+
+    // Calculate the execution duration in milliseconds
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << "PyTorch execution time: " << duration << " milliseconds" << std::endl;
+}
 template<typename ModelType>
 
 // Function to measure the performance of an RTNeural model
@@ -72,7 +109,7 @@ int main() {
 
     // Hidden_size values
 
-    std::vector<int> hidden_sizes{ 10, 20, 30, 40, 50, 60,70,80 };
+    std::vector<int> hidden_sizes{ 10, 20, 30, 40, 50, 60,70 };
 
     // Open an output file
 
@@ -97,30 +134,28 @@ int main() {
     // Define static model: modify this code to test different model
     {
         RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 10>,
-            RTNeural::DenseT<float, 10, 1>> model;
-
-        measure_performance_rt(model, signal, n_samples);
-    }
-    {
-
-        RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 20>,
+            RTNeural::Conv1DT<float,1,20,3,2>,
             RTNeural::DenseT<float, 20, 1>> model;
 
+        measure_performance_rt(model, signal, n_samples);
+    }
+    {
+        RTNeural::ModelT<float, 1, 1,
+            RTNeural::Conv1DT<float, 1,20, 3, 2>,
+            RTNeural::DenseT<float, 20, 1>> model;
 
         measure_performance_rt(model, signal, n_samples);
     }
     {
         RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 30>,
+            RTNeural::Conv1DT<float, 1, 30, 3, 2>,
             RTNeural::DenseT<float, 30, 1>> model;
 
         measure_performance_rt(model, signal, n_samples);
     }
     {
         RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 40>,
+            RTNeural::Conv1DT<float, 1, 40, 3, 2>,
             RTNeural::DenseT<float, 40, 1>> model;
 
         measure_performance_rt(model, signal, n_samples);
@@ -128,7 +163,7 @@ int main() {
     }
     {
         RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 50>,
+            RTNeural::Conv1DT<float, 1, 50, 3, 2>,
             RTNeural::DenseT<float, 50, 1>> model;
 
         measure_performance_rt(model, signal, n_samples);
@@ -137,7 +172,7 @@ int main() {
 
     {
         RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 60>,
+            RTNeural::Conv1DT<float, 1, 60, 3, 2>,
             RTNeural::DenseT<float, 60, 1>> model;
 
         measure_performance_rt(model, signal, n_samples);
@@ -145,25 +180,22 @@ int main() {
     }
     {
         RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 70>,
+            RTNeural::Conv1DT<float, 1, 70, 3, 2>,
             RTNeural::DenseT<float, 70, 1>> model;
 
         measure_performance_rt(model, signal, n_samples);
     }
 
-    {
-        RTNeural::ModelT<float, 1, 1,
-            RTNeural::LSTMLayerT<float, 1, 80>,
-            RTNeural::DenseT<float, 80, 1>> model;
-
-        measure_performance_rt(model, signal, n_samples);
-    }
 
     for (int hidden_size : hidden_sizes) {
-        // Create LSTM model with variable hidden size
-        torch::nn::LSTM lstm_model(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(1));
-        std::cout << "Performance of LSTM model with hidden size " << hidden_size << std::endl;
-        measure_performance_torch(lstm_model, n_samples);
+        // Choose model with variable hidden size
+        //torch::nn::LSTM lstm_model(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(1));
+        //torch::nn::GRU gru_model(torch::nn::GRUOptions(input_size, hidden_size).num_layers(1));
+        torch::nn::Conv1d conv_model(torch::nn::Conv1dOptions(input_size, hidden_size, 3));
+        std::cout << "Performance of Conv1d model with hidden size " << hidden_size << std::endl;
+        //measure_performance_torch_lstm(lstm_model, n_samples);
+        //measure_performance_torch_gru(gru_model, n_samples);
+        measure_performance_torch_conv(conv_model, n_samples);
     }
 
     // Restore cout buffer

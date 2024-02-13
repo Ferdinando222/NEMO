@@ -1,0 +1,22 @@
+Running "rtneural static model" example...
+RTNeural execution time with hidden size 10: 689 milliseconds
+RTNeural execution time with hidden size 10: 695 milliseconds
+RTNeural execution time with hidden size 10: 1082 milliseconds
+RTNeural execution time with hidden size 10: 1310 milliseconds
+RTNeural execution time with hidden size 10: 1666 milliseconds
+RTNeural execution time with hidden size 10: 1967 milliseconds
+RTNeural execution time with hidden size 10: 2337 milliseconds
+Performance of Conv1d model with hidden size 10
+PyTorch execution time: 16270 milliseconds
+Performance of Conv1d model with hidden size 20
+PyTorch execution time: 19031 milliseconds
+Performance of Conv1d model with hidden size 30
+PyTorch execution time: 19132 milliseconds
+Performance of Conv1d model with hidden size 40
+PyTorch execution time: 20109 milliseconds
+Performance of Conv1d model with hidden size 50
+PyTorch execution time: 21089 milliseconds
+Performance of Conv1d model with hidden size 60
+PyTorch execution time: 21330 milliseconds
+Performance of Conv1d model with hidden size 70
+PyTorch execution time: 21649 milliseconds

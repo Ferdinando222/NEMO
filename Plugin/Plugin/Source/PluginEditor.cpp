@@ -83,68 +83,6 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     loadButton.setColour(juce::Label::textColourId, juce::Colours::black);
     loadButton.addListener(this);
 
-
-    //addAndMakeVisible(irKnob);
-    //irKnob.setLookAndFeel(&ampSilverKnobLAF);
-    irKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
-    irKnob.setNumDecimalPlacesToDisplay(1);
-    irKnob.addListener(this);
-    //irKnob.setRange(0, processor.irFiles.size() - 1);
-    irKnob.setRange(0.0, 1.0);
-    irKnob.setValue(0.0);
-    irKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    irKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
-    irKnob.setNumDecimalPlacesToDisplay(1);
-    irKnob.setDoubleClickReturnValue(true, 0.0);
-
-    auto irValue = getParameterValue(irName);
-    Slider& irSlider = getIrSlider();
-    irSlider.setValue(irValue, NotificationType::dontSendNotification);
-
-    irKnob.onValueChange = [this]
-    {
-        const float sliderValue = static_cast<float> (getIrSlider().getValue());
-        const float irValue = getParameterValue(irName);
-
-        if (!approximatelyEqual(irValue, sliderValue))
-        {
-            setParameterValue(irName, sliderValue);
-
-            // create and send an OSC message with an address and a float value:
-            float value = static_cast<float> (getIrSlider().getValue());
-
-            if (!oscSender.send(irAddressPattern, value))
-            {
-                updateOutConnectedLabel(false);
-            }
-            else
-            {
-                DBG("Sent value " + String(value) + " to AP " + irAddressPattern);
-            }
-        }
-    };
-
-    addAndMakeVisible(irSelect);
-    irSelect.setColour(juce::Label::textColourId, juce::Colours::black);
-    int i = 1;
-    for (const auto& jsonFile : processor.irFiles) {
-        irSelect.addItem(jsonFile.getFileNameWithoutExtension(), i);
-        i += 1;
-    }
-    irSelect.onChange = [this] {irSelectChanged(); };
-    irSelect.setSelectedItemIndex(processor.current_ir_index, juce::NotificationType::dontSendNotification);
-    irSelect.setScrollWheelEnabled(true);
-
-    addAndMakeVisible(loadIR);
-    loadIR.setButtonText("Import IR");
-    loadIR.setColour(juce::Label::textColourId, juce::Colours::black);
-    loadIR.addListener(this);
-
-    // Toggle IR
-    //addAndMakeVisible(irButton); // Toggle is for testing purposes
-    irButton.setToggleState(true, juce::NotificationType::dontSendNotification);
-    irButton.onClick = [this] { updateToggleState(&irButton, "IR");   };
-
     // Toggle LSTM
     //addAndMakeVisible(lstmButton); // Toggle is for testing purposes
     lstmButton.setToggleState(true, juce::NotificationType::dontSendNotification);
@@ -349,45 +287,6 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
         }
     };
 
-    addAndMakeVisible(ampPresenceKnob);
-    ampPresenceKnob.setLookAndFeel(&otherLookAndFeel);
-    ampPresenceKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
-    ampPresenceKnob.setNumDecimalPlacesToDisplay(1);
-    ampPresenceKnob.addListener(this);
-    ampPresenceKnob.setRange(0.0, 1.0);
-    ampPresenceKnob.setValue(0.5);
-    ampPresenceKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    ampPresenceKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
-    ampPresenceKnob.setNumDecimalPlacesToDisplay(2);
-    ampPresenceKnob.setDoubleClickReturnValue(true, 0.5);
-
-    auto presenceValue = getParameterValue(trebleName);
-    Slider& presenceSlider = getPresenceSlider();
-    trebleSlider.setValue(presenceValue, NotificationType::dontSendNotification);
-
-    ampPresenceKnob.onValueChange = [this]
-    {
-        const float sliderValue = static_cast<float> (getPresenceSlider().getValue());
-        const float presenceValue = getParameterValue(presenceName);
-
-        if (!approximatelyEqual(presenceValue, sliderValue))
-        {
-            setParameterValue(presenceName, sliderValue);
-
-            // create and send an OSC message with an address and a float value:
-            float value = static_cast<float> (getPresenceSlider().getValue());
-
-            if (!oscSender.send(presenceAddressPattern, value))
-            {
-                updateOutConnectedLabel(false);
-            }
-            else
-            {
-                DBG("Sent value " + String(value) + " to AP " + presenceAddressPattern);
-            }
-        }
-    };
-
     addAndMakeVisible(ampDelayKnob);
     ampDelayKnob.setLookAndFeel(&otherLookAndFeel);
     ampDelayKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
@@ -495,12 +394,6 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     TrebleLabel.setColour(Label::textColourId, Colours::white);
     TrebleLabel.setJustificationType(juce::Justification::centred);
 
-    addAndMakeVisible(PresenceLabel);
-    PresenceLabel.setText("Presence", juce::NotificationType::dontSendNotification);
-    PresenceLabel.setColour(Label::backgroundColourId, Colours::black);
-    PresenceLabel.setColour(Label::textColourId, Colours::white);
-    PresenceLabel.setJustificationType(juce::Justification::centred);
-
     addAndMakeVisible(DelayLabel);
     DelayLabel.setText("Delay", juce::NotificationType::dontSendNotification);
     DelayLabel.setColour(Label::backgroundColourId, Colours::black);
@@ -517,10 +410,6 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     toneDropDownLabel.setText("Tone", juce::NotificationType::dontSendNotification);
     toneDropDownLabel.setJustificationType(juce::Justification::centred);
 
-    addAndMakeVisible(irDropDownLabel);
-    irDropDownLabel.setText("IR", juce::NotificationType::dontSendNotification);
-    irDropDownLabel.setJustificationType(juce::Justification::centred);
-
     addAndMakeVisible(versionLabel);
     versionLabel.setText("v1.3.0", juce::NotificationType::dontSendNotification);
     versionLabel.setJustificationType(juce::Justification::centred);
@@ -532,12 +421,10 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
     LevelLabel.setFont(font);
     BassLabel.setFont(font);
     MidLabel.setFont(font);
-    TrebleLabel.setFont(font);
-    PresenceLabel.setFont(font);
+    TrebleLabel.setFont(font);;
     DelayLabel.setFont(font);
     ReverbLabel.setFont(font);
     toneDropDownLabel.setFont(font);
-    irDropDownLabel.setFont(font);
     versionLabel.setFont(font);
 
 
@@ -548,19 +435,19 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& p)
 
     // IP controls:
     ipField.setEditable(true, true, true);
-    addAndMakeVisible(ipLabel);
-    addAndMakeVisible(ipField);
+    //addAndMakeVisible(ipLabel);
+    //addAndMakeVisible(ipField);
 
     // Port controls:
-    addAndMakeVisible(outPortNumberLabel);
+    //addAndMakeVisible(outPortNumberLabel);
     outPortNumberField.setEditable(true, true, true);
-    addAndMakeVisible(outPortNumberField);
-    addAndMakeVisible(outConnectedLabel);
+    //addAndMakeVisible(outPortNumberField);
+    //addAndMakeVisible(outConnectedLabel);
 
-    addAndMakeVisible(inPortNumberLabel);
+    //addAndMakeVisible(inPortNumberLabel);
     inPortNumberField.setEditable(true, true, true);
-    addAndMakeVisible(inPortNumberField);
-    addAndMakeVisible(inConnectedLabel);
+    //addAndMakeVisible(inPortNumberField);
+    //addAndMakeVisible(inConnectedLabel);
 
 
     // OSC messaging
@@ -613,7 +500,6 @@ void PluginAudioProcessorEditor::resized()
     loadButton.setBounds(11, 74, 100, 25);
     modelKnob.setBounds(140, 40, 75, 95);
 
-    irSelect.setBounds(11, 42, 270, 25);
     loadIR.setBounds(120, 74, 100, 25);
     irButton.setBounds(248, 42, 257, 25);
     lstmButton.setBounds(248, 10, 257, 25);
@@ -624,7 +510,6 @@ void PluginAudioProcessorEditor::resized()
     ampBassKnob.setBounds(10, 250, 75, 95);
     ampMidKnob.setBounds(95, 250, 75, 95);
     ampTrebleKnob.setBounds(180, 250, 75, 95);
-    ampPresenceKnob.setBounds(265, 250, 75, 95);
 
     ampDelayKnob.setBounds(180, 120, 75, 95);
     ampReverbKnob.setBounds(265, 120, 75, 95);
@@ -634,12 +519,10 @@ void PluginAudioProcessorEditor::resized()
     BassLabel.setBounds(6, 238, 80, 10);
     MidLabel.setBounds(91, 238, 80, 10);
     TrebleLabel.setBounds(178, 238, 80, 10);
-    PresenceLabel.setBounds(265, 238, 80, 10);
     DelayLabel.setBounds(178, 108, 80, 10);
     ReverbLabel.setBounds(265, 108, 80, 10);
 
     toneDropDownLabel.setBounds(267, 16, 80, 10);
-    irDropDownLabel.setBounds(261, 48, 80, 10);
     versionLabel.setBounds(268, 431, 80, 10);
 
     addAndMakeVisible(ampNameLabel);

@@ -44,6 +44,7 @@ target_sources(Plugin
     Plugin/Plugin/Source/CustomKnob.h
     Plugin/Plugin/Source/CustomKnob.cpp   
     Plugin/Plugin/Source/AmpOSCReceiver.h
+    Plugin/Plugin/Source/Delay.h
 )
 
 

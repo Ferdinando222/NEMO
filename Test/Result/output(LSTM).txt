@@ -1,0 +1,22 @@
+Running "rtneural static model" example...
+RTNeural execution time with hidden size 10: 192 milliseconds
+RTNeural execution time with hidden size 20: 605 milliseconds
+RTNeural execution time with hidden size 30: 1159 milliseconds
+RTNeural execution time with hidden size 40: 2243 milliseconds
+RTNeural execution time with hidden size 50: 5065 milliseconds
+RTNeural execution time with hidden size 60: 10596 milliseconds
+RTNeural execution time with hidden size 70: 13722 milliseconds
+Performance of LSTM model with hidden size 10
+PyTorch execution time: 147796 milliseconds
+Performance of LSTM model with hidden size 20
+PyTorch execution time: 204887 milliseconds
+Performance of LSTM model with hidden size 30
+PyTorch execution time: 209617 milliseconds
+Performance of LSTM model with hidden size 40
+PyTorch execution time: 193660 milliseconds
+Performance of LSTM model with hidden size 50
+PyTorch execution time: 190496 milliseconds
+Performance of LSTM model with hidden size 60
+PyTorch execution time: 188430 milliseconds
+Performance of LSTM model with hidden size 70
+PyTorch execution time: 166430 milliseconds

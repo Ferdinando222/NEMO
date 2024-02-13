@@ -1,0 +1,9 @@
+Running "rtneural static model" example...
+RTNeural execution time with hidden size 10: 226 milliseconds
+RTNeural execution time with hidden size 20: 606 milliseconds
+RTNeural execution time with hidden size 30: 1360 milliseconds
+RTNeural execution time with hidden size 40: 3860 milliseconds
+RTNeural execution time with hidden size 50: 5686 milliseconds
+RTNeural execution time with hidden size 60: 7314 milliseconds
+RTNeural execution time with hidden size 70: 10352 milliseconds
+Performance of GRU model with hidden size 10

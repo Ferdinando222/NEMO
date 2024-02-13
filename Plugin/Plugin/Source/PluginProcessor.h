@@ -11,6 +11,7 @@
 #include "JuceHeader.h"
 #include "RT_LSTM.h"
 #include "AmpOSCReceiver.h"
+#include "Delay.h"
 
 #pragma once
 
@@ -79,24 +80,21 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     int getModelIndex(float model_param);
-    //int getIrIndex(float ir_param);
     void loadConfig(juce::File configFile);
-    //void loadIR(juce::File irFile);
     void setupDataDirectories();
     //void installTones();
 
     //void set_ampEQ(float bass_slider, float mid_slider, float treble_slider, float presence_slider);
-    //void set_delayParams(float paramValue);
-    //void set_reverbParams(float paramValue);
+    void set_delayParams(float paramValue);
+    void set_reverbParams(float paramValue);
 
     float convertLogScale(float in_value, float x_min, float x_max, float y_min, float y_max);
 
     float decibelToLinear(float dbValue);
 
     void addDirectory(const juce::File& file);
-    //void addDirectoryIR(const juce::File& file);
     void resetDirectory(const juce::File& file);
-    //void resetDirectoryIR(const juce::File& file);
+
     std::vector<juce::File> jsonFiles;
     std::vector<juce::File> irFiles;
     juce::File currentDirectory = juce::File::getCurrentWorkingDirectory().getFullPathName();
@@ -152,13 +150,14 @@ private:
     dsp::IIR::Filter<float> dcBlocker;
 
 
-    // Effects
+    //Process chain for effects
     enum
     {
         delayIndex,
         reverbIndex
     };
 
+    juce::dsp::ProcessorChain<Delay<float>, juce::dsp::Reverb> fxChain;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginAudioProcessor)
 };
