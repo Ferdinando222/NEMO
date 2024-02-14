@@ -25,8 +25,42 @@ You can run the NEMO plugin as a standalone software or in a DAW as a VST.
 
 
 ## HOW RUN PYTHON SCRIPT FOR TRAINING
+
+### Requiriements
+-You need to have an account on Weights and Biases in order to monitor the training.
+-Python >= 3.9
+### Step 0 - Copy the Repo and create a python environment
+ You first need to download the github repo on your local machine. Create a python environment using the requirements.txt.
+### Step 1 - Login in wandb
+Log in to your Weights and Biases account using the command wandb login and enter your API key when prompted.
+### Step 2 - Create a folder data
+Create a data folder with this structure
+  
+    data
+    ├── input
+    │   ├── test
+    │   │  ├──guitar.wav
+    │   ├── train
+    │   │   ├──clean_signal-001.wav
+    ├── output
+    │   ├── test
+    │   │   ├── muff_test.wav
+    │   ├── train
+    │   │   ├── muff_train.wav
+### Step 3 - Run the train.py
+Run the python train.py script
+
 ## TESTING FOLDER
-
-## PROJECT INFO
-
+The "testing" folder contains scripts used to assess the performance of the plugin. To test the plugin in your own folder, follow this brief tutorial.
+### Step 0 - Copy the Repo
+To run the various components of the application, you first need to download the github repo on your local machine.
+### Step - Modify the CMAkeLists.txt
+In the CMakeLists.txt, update the path specified in the line set(CMAKE_PREFIX_PATH "C:/libtorch") with the path where you have the libtorch folder.
+### Step 2 - Build with Cmake
+Stay in the Test directory and create a build for Visual Studio using CMake
+### Step 3 - Open the project in Visual Studio
+Open the project in Visual Studio and build the project. `For safety, rebuild with CMake if Visual Studio cannot find files such as JuceHeader.h.`
+### Step 4 - Now choose the model that you want to test and run the code
+The output will be printed in the build folder in the output.txt file. It will display the elapsed time for each model.
 ## OTHER INFO
+For more info about Nemo, take a look at the official paper, where both the plugin and its underlying neural network model are described in detail.
