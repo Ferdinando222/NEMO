@@ -190,7 +190,6 @@ void PluginAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& 
         model_index = getModelIndex(model);
 
         auto ir = static_cast<float> (irParam->get());
-        //ir_index = getIrIndex(ir);
 
         // Applying gain adjustment for snapshot models
         if (LSTM.input_size == 1) {
@@ -395,7 +394,6 @@ void PluginAudioProcessor::setupDataDirectories()
 
     // Add the tones directory and update tone list
     addDirectory(userAppDataDirectory_tones);
-    //addDirectoryIR(userAppDataDirectory_irs);
 }
 
 
