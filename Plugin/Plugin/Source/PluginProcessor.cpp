@@ -127,8 +127,6 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     dcBlocker.coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 35.0f);
     dsp::ProcessSpec spec{ sampleRate, static_cast<uint32> (samplesPerBlock), 2 };
     dcBlocker.prepare(spec);
-
-    // fx chain
 }
 
 void PluginAudioProcessor::releaseResources()
@@ -171,6 +169,7 @@ void PluginAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& 
     const int numInputChannels = getTotalNumInputChannels();
     const int sampleRate = getSampleRate();
 
+    //Block for dsp 
     auto block = dsp::AudioBlock<float>(buffer).getSingleChannelBlock(0);
     auto context = juce::dsp::ProcessContextReplacing<float>(block);
 
@@ -200,6 +199,7 @@ void PluginAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& 
 
         // Process EQ
 
+        //ADD THE CODE HERE IF YOU WANT AN EQUALIZER
 
         // Apply LSTM model
         if (model_loaded == 1 && lstm_state == true) {
@@ -220,18 +220,6 @@ void PluginAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& 
             }
         }
 
-        // Process IR
-        if (ir_state == true && num_irs > 0) {
-            if (current_ir_index != ir_index) {
-                //loadIR(irFiles[ir_index]);
-                current_ir_index = ir_index;
-            }
-            auto block = dsp::AudioBlock<float>(buffer).getSingleChannelBlock(0);
-            auto context = juce::dsp::ProcessContextReplacing<float>(block);
-
-            // IR generally makes output quieter, add volume here to make ir on/off volume more even
-            buffer.applyGain(2.0);
-        }
 
         //    Master Volume 
         if (LSTM.input_size == 1 || LSTM.input_size == 2) {
@@ -342,7 +330,7 @@ void PluginAudioProcessor::loadConfig(File configFile)
 }
 
 
-
+// Function to reset Directory
 void PluginAudioProcessor::resetDirectory(const File& file)
 {
     jsonFiles.clear();
@@ -356,6 +344,8 @@ void PluginAudioProcessor::resetDirectory(const File& file)
 }
 
 
+
+// Function to add Directory
 void PluginAudioProcessor::addDirectory(const File& file)
 {
     if (file.isDirectory())
@@ -409,6 +399,7 @@ void PluginAudioProcessor::setupDataDirectories()
 }
 
 
+// Function to process Delay
 void PluginAudioProcessor::set_delayParams(float paramValue)
 {
     auto& del = fxChain.template get<delayIndex>();
@@ -429,7 +420,7 @@ void PluginAudioProcessor::set_delayParams(float paramValue)
     del.setFeedback(0.8 - paramValue / 2);
 }
 
-
+// Function to process Reverb
 void PluginAudioProcessor::set_reverbParams(float paramValue)
 {
     auto& rev = fxChain.template get<reverbIndex>();
